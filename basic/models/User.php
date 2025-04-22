@@ -48,8 +48,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             ['role', 'in', 'range' => array_keys(self::optsRole())],
             [['username'], 'unique'],
             [['email'], 'unique'],
+            ['email', 'email'],
             [['phone'], 'unique'],
+            ['username', 'match', 'pattern' => '/^[A-z]\w*$/i'],
+            ['full_name', 'match', 'pattern' => '/^[А-яЁё -]*$/u', 'message'=> 'Разрешен ввод только кириллицы, пробела и тире'],
+            ['phone', 'match', 'pattern' => '/^\+?7\(\d{3}\)-\d{3}-\d{2}-\d{2}$/'],
+            [['password'], 'string', 'min' => 6],
         ];
+    }
+
+    public function beforeSave($insert){
+        $this->password = md5($this->password);
+        return parent::beforeSave($insert);
     }
 
     /**
@@ -59,12 +69,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             'id' => 'ID',
-            'full_name' => 'Full Name',
-            'phone' => 'Phone',
+            'full_name' => 'ФИО',
+            'phone' => 'Телефон',
             'email' => 'Email',
-            'username' => 'Username',
-            'password' => 'Password',
-            'role' => 'Role',
+            'username' => 'Логин',
+            'password' => 'Пароль',
         ];
     }
 
